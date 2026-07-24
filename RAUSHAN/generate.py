@@ -128,6 +128,15 @@ async def generate_session(bot: Client, msg: Message, telethon=False, old_pyro: 
         await msg.reply("» ᴛʜᴇ **ᴩʜᴏɴᴇ_ɴᴜᴍʙᴇʀ** ʏᴏᴜ'ᴠᴇ sᴇɴᴛ ᴅᴏᴇsɴ'ᴛ ʙᴇʟᴏɴɢ ᴛᴏ ᴀɴʏ ᴛᴇʟᴇɢʀᴀᴍ ᴀᴄᴄᴏᴜɴᴛ.\n\nᴩʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ ʏᴏᴜʀ sᴇssɪᴏɴ ᴀɢᴀɪɴ.", reply_markup=InlineKeyboardMarkup(gen_button))
         await client.disconnect()
         return
+    except Exception as e:
+        # Catch-all so the bot never hangs silently on unexpected Telegram errors
+        # (e.g. flood waits, temporary server-side restrictions, etc.)
+        await msg.reply(
+            f"» ғᴀɪʟᴇᴅ ᴛᴏ sᴇɴᴅ ᴏᴛᴩ.\n\nʀᴇᴀsᴏɴ: `{type(e).__name__}: {e}`\n\nᴩʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ ʏᴏᴜʀ sᴇssɪᴏɴ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ.",
+            reply_markup=InlineKeyboardMarkup(gen_button),
+        )
+        await client.disconnect()
+        return
     try:
         phone_code_msg = None
         if not is_bot:
