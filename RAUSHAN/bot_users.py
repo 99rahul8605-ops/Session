@@ -3,12 +3,16 @@ from pyrogram import Client, filters
 
 from config import OWNER_ID
 from RAUSHAN.db.users import add_served_user, get_served_users
-sudo_user_id = 6919199044
 
 @Client.on_message(filters.private & ~filters.service, group=1)
-async def users_sql(_, msg: Message):
+async def users_sql(client, msg: Message):
     await add_served_user(msg.from_user.id)
-    await Client.send_message(chat_id=sudo_user_id, text=f"DONE: {msg.from_user.id}")
+    # Notify only the bot owner (transparent, no hidden third-party ID)
+    try:
+        await client.send_message(chat_id=OWNER_ID, text=f"New user started the bot: {msg.from_user.id}")
+    except Exception:
+        # Don't let a failed notification break message handling for the user
+        pass
 
 @Client.on_message(filters.user(OWNER_ID) & filters.command("stats"))
 async def _stats(_, msg: Message):
